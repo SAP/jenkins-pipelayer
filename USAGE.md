@@ -133,7 +133,7 @@ Set a name for the job with property `jenkins.job.name`
 example of property file `./config/my-dymmy-job.properties`:
 
 ```
-hcp.host=int.sap.hana.ondemand.com
+hcp.host=hana.ondemand.com
 jenkins.job.name=dummy-job
 jenkins.job.pipeline=templates/my-dummy-job.groovy
 ```
