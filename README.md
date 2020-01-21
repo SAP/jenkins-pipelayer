@@ -41,7 +41,26 @@ The library adds the folowing steps to Jenkins pipeline dsl:
 - [__approveScripts__](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md#approve-scripts) => this step approves jobs generated from templates on jenkins
 - [__libToFs__](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md#host-shared-library-on-filesystem) => particularly useful to reduce the number of queries to github
 
-Have a look at [USAGE.md](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md) for a description of the steps introduced by Jenkins Pipelayer and a better explanation of the [template engine](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md#template-engine).
+Have a look at [USAGE.md](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md) for a description of the steps introduced by Jenkins Pipelayer.
+
+The template engines introduced by step `generateJobs` can create and manage jobs based on the same template parameterized by multiple property files.
+
+For instance, the following two property files would generate job1 and job2, where job 1 displays `example.com` and job2 displays `site.com`
+
+```
+// ./config/myjob1.properties
+hcp.host=example.com
+
+// ./config/myjob2.properties
+hcp.host=site.com
+
+// mytemplate.groovy
+    steps {
+            println "{{hcp.host}}"
+    }
+```
+
+see the usage documentation here for the [template engine](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md#template-engine)
 
 We made samples to help you understand how to use the library. Please check out the [sample](https://github.com/SAP/jenkins-pipelayer/tree/master/sample) folder
 
