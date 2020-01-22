@@ -23,7 +23,7 @@ At first run of `generateJobs` step, approve the seed job.
 
 ### Generate jobs
 
-To generate jobs from jobs or templates configuration files, use `generateJobs`.
+To generate jobs from jobs or [templates configuration files](https://github.com/SAP/jenkins-pipelayer/blob/master/USAGE.md#template-engine), use `generateJobs`.
 
 Usage:
 
