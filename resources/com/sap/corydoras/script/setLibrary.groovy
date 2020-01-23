@@ -11,7 +11,7 @@ def createIfMissing(String libName, String gitUrl, String defaultVersion) {
     lib.allowVersionOverride = true
 
     GlobalLibraries globalLibraries = GlobalLibraries.get()
-    List libs = globalLibraries.libraries
+    List libs = new ArrayList(globalLibraries.libraries)
 
     boolean exists = false
     for (LibraryConfiguration libConfig : libs) {
@@ -25,5 +25,6 @@ def createIfMissing(String libName, String gitUrl, String defaultVersion) {
         libs.add(lib)
         globalLibraries.setLibraries(libs)
         globalLibraries.save()
+        println 'Library ' + libName + ' added'
     }
 }

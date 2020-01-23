@@ -6,6 +6,49 @@ Import the library in Jenkins. From __Manage__ page, go to __Configure System__
 Under section __Global Pipeline Libraries__, add a new library with name
 `jenkins-pipelayer`, default version `master`, modern scm git https://github.com/SAP/jenkins-pipelayer.git
 
+<details><summary>alternative: configure the library from a script</summary>
+<p>
+
+Execute the below script from jenkins console `https://<jenkins-url>/script`
+
+```groovy
+import jenkins.model.*
+import jenkins.plugins.git.GitSCMSource
+import org.jenkinsci.plugins.workflow.libs.*
+  
+createIfMissing('jenkins-pipelayer', 'https://github.com/SAP/jenkins-pipelayer.git', 'master')
+
+def createIfMissing(String libName, String gitUrl, String defaultVersion) {
+    println 'Add Library ' + libName + ', from repository ' + gitUrl + ' with version ' + defaultVersion
+    GitSCMSource gitScmSource = new GitSCMSource(null, gitUrl, '', 'origin', '+refs/heads/*:refs/remotes/origin/*', '*', '', true)
+    LibraryConfiguration lib = new LibraryConfiguration(libName, new SCMSourceRetriever(gitScmSource))
+    lib.defaultVersion = defaultVersion
+    lib.implicit = false
+    lib.allowVersionOverride = true
+
+    GlobalLibraries globalLibraries = GlobalLibraries.get()
+    List libs = new ArrayList(globalLibraries.libraries)
+
+    boolean exists = false
+    for (LibraryConfiguration libConfig : libs) {
+        if (libConfig.name == libName) {
+            exists = true
+            break
+        }
+    }
+
+    if (!exists) {
+        libs.add(lib)
+        globalLibraries.setLibraries(libs)
+        globalLibraries.save()
+        println 'Library ' + libName + ' added'
+    }
+}
+```
+
+</p>
+</details>
+
 approve from page __In Process Script Approval__:
 
 ```groovy
@@ -16,6 +59,36 @@ method jenkins.model.ParameterizedJobMixIn$ParameterizedJob isDisabled
 staticMethod jenkins.model.Jenkins getInstance
 staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods println java.lang.Object java.lang.Object
 ```
+
+<details><summary>recommended alternative: approve these using a script</summary>
+<p>
+
+Execute the below script from jenkins console `https://<jenkins-url>/script`
+
+```groovy
+import org.jenkinsci.plugins.scriptsecurity.scripts.*
+
+def scriptApproval = ScriptApproval.get()
+
+[
+    'method groovy.lang.GroovyObject getProperty java.lang.String',
+    'method groovy.lang.GroovyObject invokeMethod java.lang.String java.lang.Object',
+    'method jenkins.model.Jenkins getItemByFullName java.lang.String',
+    'method jenkins.model.ParameterizedJobMixIn$ParameterizedJob isDisabled',
+    'staticMethod jenkins.model.Jenkins getInstance',
+    'staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods println java.lang.Object java.lang.Object',
+    'new groovy.json.JsonSlurperClassic'
+].each { signature ->
+    scriptApproval.approveSignature(signature)
+}
+
+scriptApproval.save()
+```
+
+This approval method is recommended. Indeed if you don't use the script, whenever you run a step that uses one of these methods, your pipeline will fail, you will have to go to **In-process Script Approval** page, approve the method, restart your pipeline and repeat these steps until everything is approved.
+
+</p>
+</details>
 
 At first run of `generateJobs` step, approve the seed job.
 
